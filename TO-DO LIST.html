@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-do list</title>
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: arial;
+            margin: 0px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        #todo-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 300px;
+        }
+        #todo-header {
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 20px;
+        }
+        #task-input {
+            width: 70%;
+            padding: 8px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            outline: none;
+        }
+        #add-task-btn {
+            width: 25%;
+            padding: 8px;
+            margin: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            outline: none;
+        }
+        #tasks {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .task-item button {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div id='todo-container'>
+        <div id="todo-header">
+            TO-DO LIST
+        </div>
+        <div>
+            <input type="text" id="task-input" placeholder="Enter Task">
+            <button id="add-task-btn" onclick="addTask()">Add Task</button>
+        </div>
+        <ul id="tasks"></ul>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            loadTasks();
+        });
+
+        function addTask() {
+            const taskInput = document.getElementById('task-input');
+            const taskText = taskInput.value.trim();
+
+            if (taskText === '') {
+                alert('You entered an empty text');
+                return;
+            }
+
+            const taskList = document.getElementById('tasks');
+            const taskItem = document.createElement('li');
+
+            taskItem.innerHTML = `
+                <span>${taskText}</span>
+                <button onclick="removeTask(this)">Remove</button>
+            `;
+            taskList.appendChild(taskItem);
+            taskInput.value = '';
+
+            // Save to local storage
+            saveTasks();
+        }
+
+        function removeTask(button) {
+            const taskItem = button.parentElement;
+            const taskList = document.getElementById('tasks');
+            taskList.removeChild(taskItem);
+
+            // Save to local storage
+            saveTasks();
+        }
+
+        function saveTasks() {
+            const taskList = document.getElementById('tasks');
+            const tasks = Array.from(taskList.children).map(taskItem => taskItem.querySelector('span').innerText);
+
+            // Save to local storage
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        function loadTasks() {
+            const taskList = document.getElementById('tasks');
+            const savedTasks = localStorage.getItem('tasks');
+
+            if (savedTasks) {
+                const tasks = JSON.parse(savedTasks);
+
+                tasks.forEach(taskText => {
+                    const taskItem = document.createElement('li');
+                    taskItem.className = 'task-item';
+                    taskItem.innerHTML = `
+                        <span>${taskText}</span>
+                        <button  onclick="removeTask(this)">Remove</button>
+                    `;
+                    taskList.appendChild(taskItem);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
